@@ -1,0 +1,22 @@
+﻿<Window x:Class="oop_quacc_wpf.CommandWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:oop_quacc_wpf"
+        mc:Ignorable="d"
+        Title="CommandWindow" Height="100" Width="640" ShowInTaskbar="False" Topmost="True" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" WindowStyle="None" AllowsTransparency="True">
+    <Window.Background>
+        <ImageBrush ImageSource="pack://application:,,,/Images/comm_bg.png"/>
+    </Window.Background>
+    <DockPanel VerticalAlignment="Center">
+
+        <ComboBox x:Name="ExecuterComboBox" Width="120" Margin="20,0,0,0" FontSize="14" VerticalAlignment="Center">
+            <ComboBoxItem Content="QUACC" IsSelected="True"/>
+            <ComboBoxItem Content="QUACC Math"/>
+            <ComboBoxItem Content="cmd"/>
+        </ComboBox>
+
+        <TextBox x:Name="CommandTextBox" TextWrapping="Wrap" BorderThickness="0,0,0,2" FontFamily="Cascadia Code" FontSize="48" Margin="10,0,20,0"/>
+    </DockPanel>
+</Window>
