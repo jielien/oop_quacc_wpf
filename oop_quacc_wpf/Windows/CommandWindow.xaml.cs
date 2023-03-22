@@ -1,4 +1,5 @@
-﻿using System;
+﻿using oop_quacc_wpf.CommandsSystem;
+using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,8 +41,12 @@ namespace oop_quacc_wpf
         HwndSource Source { get; set; }
         #endregion
 
+        public CommandsSystemManager CommandsSystemManager { get; private set; }
+
         public CommandWindow()
         {
+            CommandsSystemManager = new CommandsSystemManager(new List<CommandsExecuter>());
+
             InitializeComponent();
         }
 
