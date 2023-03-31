@@ -1,4 +1,5 @@
 ﻿using oop_quacc_wpf.CommandsSystem;
+using oop_quacc_wpf.CommandsSystem.CommandsExecuters;
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
@@ -41,11 +42,16 @@ namespace oop_quacc_wpf
         HwndSource Source { get; set; }
         #endregion
 
+        private CommandsExecuter[] DefaultExecuters =
+        { 
+            new QUACCComandsExecuter()
+        };
+
         public CommandsSystemManager CommandsSystemManager { get; private set; }
 
         public CommandWindow()
         {
-            CommandsSystemManager = new CommandsSystemManager(new List<CommandsExecuter>());
+            CommandsSystemManager = new CommandsSystemManager(new List<CommandsExecuter>(DefaultExecuters));
 
             InitializeComponent();
         }
@@ -101,11 +107,15 @@ namespace oop_quacc_wpf
 
         private void CommandTextBox_KeyUp(object sender, KeyEventArgs e)
         {
+            // on command accept (there is a command in TextBox and Enter was pressed)
             if (e.Key == Key.Enter && sender is TextBox textBox)
             {
-                // your event handler here
-                e.Handled = true;
-                MessageBox.Show(textBox.Text);
+                if(textBox.Text != String.Empty)
+                {
+                    // your event handler here
+                    e.Handled = true;
+                    MessageBox.Show(textBox.Text);
+                }
             }
         }
 

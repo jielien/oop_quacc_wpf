@@ -51,21 +51,22 @@ namespace oop_quacc_wpf.CommandsSystem
 		/// <summary>
 		/// Tries to add <see cref="CommandsExecuter"/> <paramref name="e"/>, unless there already is a <see cref="CommandsExecuter"/> of the same type.
 		/// </summary>
-		/// <returns>True if <paramref name="e"/> was successfully added, False instead.</returns>
+		/// <returns>True if <paramref name="e"/> was successfully canAdd, False instead.</returns>
 		public bool AddExecuter(CommandsExecuter e)
 		{
-			bool added = true;
+			bool canAdd = true;
 			foreach (var executer in Executers)
 			{
+				// check if there already is Executer of the same type
 				if (executer.GetType() == e.GetType())
 				{
-					added = false;
+					canAdd = false;
 					break;
 				}
 			}
-			if (added) Executers.Add(e);
+			if (canAdd) Executers.Add(e);
 
-			return added;
+			return canAdd;
 		}
 	}
 }
