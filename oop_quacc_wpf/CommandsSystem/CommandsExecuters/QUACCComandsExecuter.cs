@@ -37,7 +37,7 @@ namespace oop_quacc_wpf.CommandsSystem.CommandsExecuters
             {
                 { "hw", HelloWorld },
                 { "op", Open },
-                { "addpath", AddToPath },
+                { "adds", AddToPath },
                 { "exit", Exit }
             };
 
@@ -81,7 +81,9 @@ namespace oop_quacc_wpf.CommandsSystem.CommandsExecuters
         /// </summary>
         private CommandExecutionState AddToPath(string[] args)
         {
-            if (args.Length == 2 && (Directory.Exists(args[1]) || File.Exists(args[1])))
+            var url = CommandsHelper.CreateValidURLFrom(args[1]);
+            if (url != null) args[1] = url;
+            if (args.Length == 2 && (Directory.Exists(args[1]) || File.Exists(args[1]) || url != null))
             {
                 var regex = new Regex(@"^\w+$");
                 if (regex.IsMatch(args[0]))

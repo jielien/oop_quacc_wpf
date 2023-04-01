@@ -25,7 +25,7 @@
 
   <ItemGroup>
     <None Update="Configs\quacc_config.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
