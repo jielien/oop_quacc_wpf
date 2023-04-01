@@ -42,18 +42,28 @@ namespace oop_quacc_wpf
         HwndSource Source { get; set; }
         #endregion
 
+        /// <summary>
+        /// QUACC app default executers.
+        /// </summary>
         private CommandsExecuter[] DefaultExecuters =
-        { 
-            new QUACCComandsExecuter()
+        {
+            new QUACCComandsExecuter(),
+            new QUACCMathCommandsExecuter()
         };
 
         public CommandsSystemManager CommandsSystemManager { get; private set; }
 
         public CommandWindow()
         {
+            // Init CSM with default executers
             CommandsSystemManager = new CommandsSystemManager(new List<CommandsExecuter>(DefaultExecuters));
 
             InitializeComponent();
+
+            // add options to ExecuterComboBox
+            foreach (var e in CommandsSystemManager.Executers)
+                ExecuterComboBox.Items.Add(e.Name);
+            ExecuterComboBox.SelectedIndex = 0;
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -64,7 +74,9 @@ namespace oop_quacc_wpf
             CommandTextBox.Focus();
         }
 
-        // Cleans up
+        /// <summary>
+        /// Unregisters hotkeys and cloese the app.
+        /// </summary>
         protected override void OnClosed(EventArgs e)
         {
             Source.RemoveHook(On_WindowShow);
@@ -72,14 +84,11 @@ namespace oop_quacc_wpf
             base.OnClosed(e);
         }
 
-        // Create bindings to hotkeys and overall keyboard input
+        /// <summary>
+        /// Create bindings to hotkeys and overall keyboard input
+        /// </summary>
         private void InitializeHotkeys()
         {
-            // Register event for handling command inputs
-            EventManager.RegisterClassHandler(typeof(TextBox),
-                KeyUpEvent,
-                new KeyEventHandler(CommandTextBox_KeyUp));
-
             // Show command window hotkey
             WindowHandle = new WindowInteropHelper(this).Handle;
             Source = HwndSource.FromHwnd(WindowHandle);
@@ -92,31 +101,39 @@ namespace oop_quacc_wpf
             CommandBindings.Add(new CommandBinding(hideCmdWindow, On_WindowHide));
         }
 
-        // Shows command window
+        /// <summary>
+        /// Shows command window and sets focus to it.
+        /// </summary>
         public void ShowWindow()
         {
             Visibility = Visibility.Visible;
             CommandTextBox.Focus();
         }
 
-        // Hides command window
+        /// <summary>
+        /// Hides command window.
+        /// </summary>
         public void HideWindow()
         {
             Visibility = Visibility.Collapsed;
         }
 
-        private void CommandTextBox_KeyUp(object sender, KeyEventArgs e)
+        /// <summary>
+        /// Is triggered when KeyDown event fires on <see cref="CommandTextBox"/>.
+        /// </summary>
+        private void CommandTextBox_KeyDown(object sender, KeyEventArgs e)
         {
             // on command accept (there is a command in TextBox and Enter was pressed)
             if (e.Key == Key.Enter && sender is TextBox textBox)
-            {
-                if(textBox.Text != String.Empty)
+                if (textBox.Text != String.Empty)
                 {
-                    // your event handler here
-                    e.Handled = true;
-                    MessageBox.Show(textBox.Text);
+                    var state = CommandsSystemManager.ExecuteCommand(textBox.Text.Trim(), ExecuterComboBox.SelectedItem as string);
+                    if(state == CommandExecutionState.Exit) Application.Current.Shutdown();
+                    if (state == CommandExecutionState.Executed)
+                        textBox.Clear();
+                    else
+                        MessageBox.Show(state.ToString());
                 }
-            }
         }
 
         #region Events
