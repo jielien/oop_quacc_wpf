@@ -93,7 +93,7 @@ namespace oop_quacc_wpf
             WindowHandle = new WindowInteropHelper(this).Handle;
             Source = HwndSource.FromHwnd(WindowHandle);
             Source.AddHook(On_WindowShow);
-            RegisterHotKey(WindowHandle, HK_ID_SHOW_WINDOW, MOD_CTRL | MOD_SHIFT, VK_Q);
+            RegisterHotKey(WindowHandle, HK_ID_SHOW_WINDOW, MOD_CTRL | MOD_SHIFT, VK_P);
 
             // Hide command window hotkey
             RoutedCommand hideCmdWindow = new RoutedCommand();
