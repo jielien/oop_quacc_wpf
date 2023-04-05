@@ -24,7 +24,7 @@ This command pops up a message box with a "Hello World" message. The `#args` inp
 
 > op **#arg**
 
-This command checks whether you have registered a shortcut to a *source* with the name `#arg`.
+This command checks whether you have registered a shortcut to a *source* with the name `#arg`. If it is not recognised as a shortcut, QUACC tries to navigate to and open the *source* directly.
 
 ### Add Shortcut
 

@@ -36,7 +36,7 @@ namespace oop_quacc_wpf
         private const uint MOD_CTRL = 0x02;
         private const uint MOD_SHIFT = 0x04;
 
-        private const uint VK_Q = 0x51;
+        private const uint VK_P = 0x50;
 
         IntPtr WindowHandle { get; set; }
         HwndSource Source { get; set; }
