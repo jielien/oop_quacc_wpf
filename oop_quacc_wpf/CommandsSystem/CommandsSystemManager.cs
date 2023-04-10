@@ -26,12 +26,14 @@ namespace oop_quacc_wpf.CommandsSystem
         /// <summary>
         /// Tries to find and execute command. If command was not found in <paramref name="executer"/>, tries to find it and execute in other <see cref="Executers"/>.
         /// </summary>
-        public CommandExecutionState ExecuteCommand(string command, string executerName)
+        public CommandExecutionRespond ExecuteCommand(string command, string executerName)
         {
+            // Extract command and arguments
             var splitted = command.Split(' ');
             var comm = splitted[0];
             var args = splitted.Skip(1).ToArray();
 
+            // Find valid executer and try to execute
             var validExecuters = Executers.Where(e => e.Name == executerName);
             if (validExecuters.Count() == 1) // if executer was found
             {
@@ -41,13 +43,13 @@ namespace oop_quacc_wpf.CommandsSystem
                 else
                 {
                     foreach (var e in Executers)
-                        if (!e.GetType().Equals(executer)) // if executert is not same as e
+                        if (!e.GetType().Equals(executer)) // if executer is not same as e
                             if (e.CommandIsValid(command)) // if command is valid
                                 return e.Execute(comm, args);
-                    return CommandExecutionState.CommandNotFound;
+                    return CommandExecutionRespond.CommandNotFound;
                 }
             }
-            else return CommandExecutionState.InvalidExecuter;
+            else return CommandExecutionRespond.InvalidExecuter;
         }
 
         /// <summary>

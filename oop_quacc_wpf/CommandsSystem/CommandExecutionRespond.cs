@@ -9,12 +9,13 @@ namespace oop_quacc_wpf.CommandsSystem
 	/// <summary>
 	/// Defines the result of command execution function.
 	/// </summary>
-	public enum CommandExecutionState
+	public enum CommandExecutionRespond
 	{
 		CommandNotFound,
 		Executed,
 		CouldNotExecute,
 		InvalidExecuter,
+		WrongNumberOfArguments,
 
 		Exit
 	}

@@ -17,7 +17,7 @@ namespace oop_quacc_wpf.CommandsSystem.CommandsExecuters
         {
             Name = "QUACC Math";
 
-            Commands = new Dictionary<string, Func<string[], CommandExecutionState>>(){
+            Commands = new Dictionary<string, Func<string[], CommandExecutionRespond>>(){
                 { "hw", HelloWorld }
             };
         }
@@ -29,10 +29,10 @@ namespace oop_quacc_wpf.CommandsSystem.CommandsExecuters
 
         #region COMMAND FUNCTIONS
 
-        private CommandExecutionState HelloWorld(string[] args)
+        private CommandExecutionRespond HelloWorld(string[] args)
         {
             MessageBox.Show("Hello World!\n" + args);
-            return CommandExecutionState.Executed;
+            return CommandExecutionRespond.Executed;
         }
 
         #endregion

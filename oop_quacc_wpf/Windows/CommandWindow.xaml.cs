@@ -75,16 +75,6 @@ namespace oop_quacc_wpf
         }
 
         /// <summary>
-        /// Unregisters hotkeys and cloese the app.
-        /// </summary>
-        protected override void OnClosed(EventArgs e)
-        {
-            Source.RemoveHook(On_WindowShow);
-            UnregisterHotKey(WindowHandle, HK_ID_SHOW_WINDOW);
-            base.OnClosed(e);
-        }
-
-        /// <summary>
         /// Create bindings to hotkeys and overall keyboard input
         /// </summary>
         private void InitializeHotkeys()
@@ -99,6 +89,25 @@ namespace oop_quacc_wpf
             RoutedCommand hideCmdWindow = new RoutedCommand();
             hideCmdWindow.InputGestures.Add(new KeyGesture(Key.Escape, ModifierKeys.None));
             CommandBindings.Add(new CommandBinding(hideCmdWindow, On_WindowHide));
+        }
+
+        /// <summary>
+        /// Is triggered when KeyDown event fires on <see cref="CommandTextBox"/>.
+        /// </summary>
+        private void CommandTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            // on command accept (there is a command in TextBox and Enter was pressed)
+            if (e.Key == Key.Enter && sender is TextBox textBox)
+                if (textBox.Text != String.Empty)
+                {
+                    var respond = CommandsSystemManager.ExecuteCommand(textBox.Text.Trim(), ExecuterComboBox.SelectedItem as string);
+
+                    if(respond == CommandExecutionRespond.Exit) Application.Current.Shutdown();
+                    if (respond == CommandExecutionRespond.Executed)
+                        textBox.Clear();
+                    else
+                        ShowErrorMessageBox(respond.ToString());
+                }
         }
 
         /// <summary>
@@ -119,22 +128,24 @@ namespace oop_quacc_wpf
         }
 
         /// <summary>
-        /// Is triggered when KeyDown event fires on <see cref="CommandTextBox"/>.
+        /// Unregisters hotkeys and closes the app.
         /// </summary>
-        private void CommandTextBox_KeyDown(object sender, KeyEventArgs e)
+        protected override void OnClosed(EventArgs e)
         {
-            // on command accept (there is a command in TextBox and Enter was pressed)
-            if (e.Key == Key.Enter && sender is TextBox textBox)
-                if (textBox.Text != String.Empty)
-                {
-                    var state = CommandsSystemManager.ExecuteCommand(textBox.Text.Trim(), ExecuterComboBox.SelectedItem as string);
-                    if(state == CommandExecutionState.Exit) Application.Current.Shutdown();
-                    if (state == CommandExecutionState.Executed)
-                        textBox.Clear();
-                    else
-                        MessageBox.Show(state.ToString());
-                }
+            Source.RemoveHook(On_WindowShow);
+            UnregisterHotKey(WindowHandle, HK_ID_SHOW_WINDOW);
+            base.OnClosed(e);
         }
+
+        #region Utilities
+        /// <summary>
+        /// Shows a <see cref="MessageBox"/> with Error styling.
+        /// </summary>
+        private void ShowErrorMessageBox(string content)
+        {
+            MessageBox.Show(content, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        #endregion
 
         #region Events
         // Recieves event from win os

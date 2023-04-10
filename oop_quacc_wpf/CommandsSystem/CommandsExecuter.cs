@@ -19,12 +19,12 @@ namespace oop_quacc_wpf.CommandsSystem
         /// <summary>
         /// Defines all the commands and their callbacks.
         /// </summary>
-        public Dictionary<string, Func<string[], CommandExecutionState>> Commands { get; protected set; }
+        public Dictionary<string, Func<string[], CommandExecutionRespond>> Commands { get; protected set; }
 
         /// <summary>
         /// Executes command <paramref name="comm"/> from <see cref="Commands"/> with arguments <paramref name="args"/>.
         /// </summary>
-        public CommandExecutionState Execute(string comm, params string[] args) =>
+        public CommandExecutionRespond Execute(string comm, params string[] args) =>
             Commands[comm](args);
 
         /// <summary>

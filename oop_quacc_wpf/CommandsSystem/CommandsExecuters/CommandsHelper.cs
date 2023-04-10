@@ -18,7 +18,7 @@ namespace oop_quacc_wpf.CommandsSystem.CommandsExecuters
         /// </summary>
         public static void OpenWithDefaultApp(string path)
         {
-            Process.Start("explorer", path);
+            Process.Start("explorer", "\"" + path + "\"");
         }
 
         /// <summary>

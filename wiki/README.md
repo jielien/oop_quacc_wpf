@@ -32,6 +32,12 @@ This command checks whether you have registered a shortcut to a *source* with th
 
 This command creates a new shortcut under the name `#name` pointing to a *source* defined by `#path`.
 
+### Search
+
+> s **#args**
+
+Initiaties a Google search of given `#args`. In the future the search engine will be changeable.
+
 ### Exit
 
 > exit
