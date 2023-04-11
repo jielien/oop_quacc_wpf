@@ -3,6 +3,7 @@ using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
+using System.Printing;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,9 +14,12 @@ namespace oop_quacc_wpf.CommandsSystem
     /// </summary>
     public class CommandsSystemManager
     {
+        private const uint HISTORY_SIZE = 16;
+
         public CommandsSystemManager(List<CommandsExecuter> executers)
         {
             Executers = executers;
+            CommandsHistory = new CommandsHistory(HISTORY_SIZE);
         }
 
         /// <summary>
@@ -24,10 +28,17 @@ namespace oop_quacc_wpf.CommandsSystem
         public List<CommandsExecuter> Executers { get; private set; }
 
         /// <summary>
+        /// Provides a history of recent commands.
+        /// </summary>
+        private CommandsHistory CommandsHistory { get; set; }
+
+        /// <summary>
         /// Tries to find and execute command. If command was not found in <paramref name="executer"/>, tries to find it and execute in other <see cref="Executers"/>.
         /// </summary>
         public CommandExecutionRespond ExecuteCommand(string command, string executerName)
         {
+            CommandsHistory.Add(command);
+
             // Extract command and arguments
             var splitted = command.Split(' ');
             var comm = splitted[0];
@@ -72,5 +83,10 @@ namespace oop_quacc_wpf.CommandsSystem
 
             return canAdd;
         }
+
+        public string? NextCommand() =>
+            CommandsHistory.Next();
+        public string? PreviousCommand() =>
+            CommandsHistory.Previous();
     }
 }

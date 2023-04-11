@@ -14,6 +14,6 @@
         <ComboBox x:Name="ExecuterComboBox" Width="120" Margin="20,0,0,0" FontSize="14" VerticalAlignment="Center"/>
 
 
-        <TextBox x:Name="CommandTextBox" TextWrapping="Wrap" BorderThickness="0,0,0,2" FontFamily="Cascadia Code" FontSize="48" Margin="10,0,20,0" KeyDown="CommandTextBox_KeyDown" ScrollViewer.CanContentScroll="True" MaxHeight="80"/>
+        <TextBox x:Name="CommandTextBox" TextWrapping="Wrap" BorderThickness="0,0,0,2" FontFamily="Cascadia Code" FontSize="48" Margin="10,0,20,0" PreviewKeyDown="CommandTextBox_PreviewKeyDown" KeyDown="CommandTextBox_KeyDown" ScrollViewer.CanContentScroll="True" MaxHeight="80"/>
     </DockPanel>
 </Window>

@@ -92,22 +92,50 @@ namespace oop_quacc_wpf
         }
 
         /// <summary>
+        /// Handles key input events, that cannot be handled by ordinary KeyDown event.
+        /// </summary>
+        private void CommandTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (sender is TextBox textBox)
+            {
+                // Commands history navigation
+                if (e.Key.Equals(Key.Up))
+                {
+                    var prev = CommandsSystemManager.PreviousCommand();
+                    if (prev != null)
+                        textBox.Text = prev;
+                }
+                else if (e.Key.Equals(Key.Down))
+                {
+                    var next = CommandsSystemManager.NextCommand();
+                    if (next != null)
+                        textBox.Text = next;
+                }
+            }
+        }
+
+        /// <summary>
         /// Is triggered when KeyDown event fires on <see cref="CommandTextBox"/>.
         /// </summary>
         private void CommandTextBox_KeyDown(object sender, KeyEventArgs e)
         {
-            // on command accept (there is a command in TextBox and Enter was pressed)
-            if (e.Key == Key.Enter && sender is TextBox textBox)
-                if (textBox.Text != String.Empty)
+            if (sender is TextBox textBox)
+            {
+                // On command accept (there is a command in TextBox and Enter was pressed)
+                if (e.Key.Equals(Key.Enter))
                 {
-                    var respond = CommandsSystemManager.ExecuteCommand(textBox.Text.Trim(), ExecuterComboBox.SelectedItem as string);
+                    if (textBox.Text != String.Empty)
+                    {
+                        var respond = CommandsSystemManager.ExecuteCommand(textBox.Text.Trim(), ExecuterComboBox.SelectedItem as string);
 
-                    if(respond == CommandExecutionRespond.Exit) Application.Current.Shutdown();
-                    if (respond == CommandExecutionRespond.Executed)
-                        textBox.Clear();
-                    else
-                        ShowErrorMessageBox(respond.ToString());
+                        if (respond == CommandExecutionRespond.Exit) Application.Current.Shutdown();
+                        if (respond == CommandExecutionRespond.Executed)
+                            textBox.Clear();
+                        else
+                            ShowErrorMessageBox(respond.ToString());
+                    }
                 }
+            }
         }
 
         /// <summary>
