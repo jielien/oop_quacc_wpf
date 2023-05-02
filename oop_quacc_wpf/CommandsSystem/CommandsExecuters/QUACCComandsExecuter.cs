@@ -39,9 +39,9 @@ namespace oop_quacc_wpf.CommandsSystem.CommandsExecuters
             Commands = new Dictionary<string, Func<string[], CommandExecutionResponse>>()
             {
                 { "hw", HelloWorld },
-                { "os", OpenSource },
-                { "as", AddSource },
-                { "rs", RemoveSource },
+                { "os", OpenShortcut },
+                { "as", AddShortcut },
+                { "rs", RemoveShortcut },
                 { "s", Search },
                 { "h", Hide },
                 { "x", Exit },
@@ -70,7 +70,7 @@ namespace oop_quacc_wpf.CommandsSystem.CommandsExecuters
         /// <summary>
         /// Checks whether the <paramref name="args"/> is valid path shortcut or URL. Then opens it with default app.
         /// </summary>
-        private CommandExecutionResponse OpenSource(string[] args)
+        private CommandExecutionResponse OpenShortcut(string[] args)
         {
             if (args.Length != 1) return CommandExecutionResponse.WrongNumberOfArguments(1, args.Length);
 
@@ -87,7 +87,7 @@ namespace oop_quacc_wpf.CommandsSystem.CommandsExecuters
         /// <summary>
         /// Adds new path shortcut to <see cref="Paths"/>.
         /// </summary>
-        private CommandExecutionResponse AddSource(string[] args)
+        private CommandExecutionResponse AddShortcut(string[] args)
         {
             if(args.Length < 2) return CommandExecutionResponse.WrongNumberOfArguments(2, args.Length);
 
@@ -117,7 +117,7 @@ namespace oop_quacc_wpf.CommandsSystem.CommandsExecuters
         /// <summary>
         /// Removes a path from <see cref="Paths"/>.
         /// </summary>
-        private CommandExecutionResponse RemoveSource(string[] args)
+        private CommandExecutionResponse RemoveShortcut(string[] args)
         {
             if(args.Length != 1) return CommandExecutionResponse.WrongNumberOfArguments(1, args.Length);
 
@@ -147,7 +147,7 @@ namespace oop_quacc_wpf.CommandsSystem.CommandsExecuters
             if (args.Length < 1) return CommandExecutionResponse.WrongNumberOfArguments(1, args.Length);
 
             string encoded = Uri.EscapeDataString(string.Join("+", args));
-            return OpenSource(("https://google.com/search?q=" + encoded).Split(' '));
+            return OpenShortcut(("https://google.com/search?q=" + encoded).Split(' '));
         }
 
         /// <summary>
