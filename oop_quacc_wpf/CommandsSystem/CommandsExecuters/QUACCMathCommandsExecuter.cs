@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using oop_quacc_wpf.CommandsSystem.ResponseSystem;
 
 namespace oop_quacc_wpf.CommandsSystem.CommandsExecuters
 {
@@ -13,11 +14,13 @@ namespace oop_quacc_wpf.CommandsSystem.CommandsExecuters
     public class QUACCMathCommandsExecuter : CommandsExecuter
     {
         public override string Name { get; protected set; }
+        public override string ConfigName { get; protected set; }
+
         public QUACCMathCommandsExecuter()
         {
             Name = "QUACC Math";
 
-            Commands = new Dictionary<string, Func<string[], CommandExecutionRespond>>(){
+            Commands = new Dictionary<string, Func<string[], CommandExecutionResponse>>(){
                 { "hw", HelloWorld }
             };
         }
@@ -29,10 +32,10 @@ namespace oop_quacc_wpf.CommandsSystem.CommandsExecuters
 
         #region COMMAND FUNCTIONS
 
-        private CommandExecutionRespond HelloWorld(string[] args)
+        private CommandExecutionResponse HelloWorld(string[] args)
         {
             MessageBox.Show("Hello World!\n" + args);
-            return CommandExecutionRespond.Executed;
+            return CommandExecutionResponse.Executed();
         }
 
         #endregion

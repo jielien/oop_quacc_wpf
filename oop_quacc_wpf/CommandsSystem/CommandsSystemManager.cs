@@ -1,4 +1,5 @@
 ﻿using oop_quacc_wpf.CommandsSystem.CommandsExecuters;
+using oop_quacc_wpf.CommandsSystem.ResponseSystem;
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
@@ -35,7 +36,7 @@ namespace oop_quacc_wpf.CommandsSystem
         /// <summary>
         /// Tries to find and execute command. If command was not found in <paramref name="executer"/>, tries to find it and execute in other <see cref="Executers"/>.
         /// </summary>
-        public CommandExecutionRespond ExecuteCommand(string command, string executerName)
+        public CommandExecutionResponse ExecuteCommand(string command, string executerName)
         {
             CommandsHistory.Add(command);
 
@@ -57,10 +58,10 @@ namespace oop_quacc_wpf.CommandsSystem
                         if (!e.GetType().Equals(executer)) // if executer is not same as e
                             if (e.CommandIsValid(command)) // if command is valid
                                 return e.Execute(comm, args);
-                    return CommandExecutionRespond.CommandNotFound;
+                    return CommandExecutionResponse.CommandNotFound();
                 }
             }
-            else return CommandExecutionRespond.InvalidExecuter;
+            else return CommandExecutionResponse.InvalidExecuter();
         }
 
         /// <summary>

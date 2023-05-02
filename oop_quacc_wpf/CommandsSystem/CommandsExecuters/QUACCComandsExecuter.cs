@@ -1,5 +1,7 @@
 ﻿using Microsoft.VisualBasic;
+using oop_quacc_wpf.CommandsSystem.ResponseSystem;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,13 +18,14 @@ namespace oop_quacc_wpf.CommandsSystem.CommandsExecuters
     /// </summary>
     public class QUACCComandsExecuter : CommandsExecuter
     {
-
+        public override string Name { get; protected set; }
+        public override string ConfigName { get; protected set; }
         public Dictionary<string, string> Paths { get; private set; }
 
-        public override string Name { get; protected set; }
         public QUACCComandsExecuter()
         {
             Name = "QUACC";
+            ConfigName = "quacc_config";
 
             Config();
         }
@@ -33,17 +36,18 @@ namespace oop_quacc_wpf.CommandsSystem.CommandsExecuters
         /// <exception cref="FileFormatException"></exception>
         private void Config()
         {
-            Commands = new Dictionary<string, Func<string[], CommandExecutionRespond>>()
+            Commands = new Dictionary<string, Func<string[], CommandExecutionResponse>>()
             {
                 { "hw", HelloWorld },
-                { "op", Open },
-                { "adds", AddToPath },
-                { "exit", Exit },
-                { "s", Search }
+                { "os", OpenSource },
+                { "as", AddSource },
+                { "rs", RemoveSource },
+                { "s", Search },
+                { "h", Hide },
+                { "x", Exit },
             };
 
-            FileStream fs = File.OpenRead(Directory.GetCurrentDirectory() + "\\Configs\\quacc_config.json");
-            Paths = JsonSerializer.Deserialize<Dictionary<string, string>>(fs) ?? throw new FileFormatException("Config file could not be deserialized!");
+            Paths = ExecutersHelper.ReadConfig<Dictionary<string, string>>(ConfigName);
         }
 
         /// <inheritdoc/>
@@ -56,75 +60,104 @@ namespace oop_quacc_wpf.CommandsSystem.CommandsExecuters
         /// <summary>
         /// Simple Hello World command function.
         /// </summary>
-        private CommandExecutionRespond HelloWorld(string[] args)
+        private CommandExecutionResponse HelloWorld(string[] args)
         {
             MessageBox.Show("Hello World!\n" + string.Join(' ', args));
-            return CommandExecutionRespond.Executed;
+
+            return CommandExecutionResponse.Executed();
         }
 
         /// <summary>
         /// Checks whether the <paramref name="args"/> is valid path shortcut or URL. Then opens it with default app.
         /// </summary>
-        private CommandExecutionRespond Open(string[] args)
+        private CommandExecutionResponse OpenSource(string[] args)
         {
-            if (args.Length != 1) return CommandExecutionRespond.WrongNumberOfArguments;
+            if (args.Length != 1) return CommandExecutionResponse.WrongNumberOfArguments(1, args.Length);
 
             var path = string.Join(' ', args);
-            var url = CommandsHelper.CreateValidURLFrom(path);
+            var url = ExecutersHelper.CreateValidURLFrom(path);
             if (Paths.ContainsKey(path))
-                CommandsHelper.OpenWithDefaultApp(Paths[path]);
+                ExecutersHelper.OpenWithDefaultApp(Paths[path]);
             else if (url != null)
-                CommandsHelper.OpenWithDefaultApp(url);
-            else return CommandExecutionRespond.CouldNotExecute;
-            return CommandExecutionRespond.Executed;
+                ExecutersHelper.OpenWithDefaultApp(url);
+            else return CommandExecutionResponse.CouldNotExecute("Source not found!");
+            return CommandExecutionResponse.Executed();
         }
 
         /// <summary>
         /// Adds new path shortcut to <see cref="Paths"/>.
         /// </summary>
-        private CommandExecutionRespond AddToPath(string[] args)
+        private CommandExecutionResponse AddSource(string[] args)
         {
-            if(args.Length != 2) return CommandExecutionRespond.WrongNumberOfArguments;
+            if(args.Length < 2) return CommandExecutionResponse.WrongNumberOfArguments(2, args.Length);
 
-            var url = CommandsHelper.CreateValidURLFrom(args[1]);
-            if (url != null) args[1] = url;
-            if (args.Length == 2 && (Directory.Exists(args[1]) || File.Exists(args[1]) || url != null))
+            string alias = args[0];
+            string path = string.Join(" ", args.Skip(1));
+
+            // Try to create a valid URL from path
+            var url = ExecutersHelper.CreateValidURLFrom(path);
+            if (url != null) path = url;
+
+            // If there is a valid directory, file or URL
+            if (Directory.Exists(path) || File.Exists(path) || url != null)
             {
-                var regex = new Regex(@"^\w+$");
-                if (regex.IsMatch(args[0]))
+                var regex = new Regex(@"^\w+$"); // Regex for letters, numbers and underscore
+                if (regex.IsMatch(alias))
                 {
-                    Paths.Add(args[0], args[1]);
-                    return CommandExecutionRespond.Executed;
+                    Paths.Add(alias, path);
+                    ExecutersHelper.SaveConfig(Paths, ConfigName);
+                    return CommandExecutionResponse.Executed();
                 }
-                else MessageBox.Show("Path shortcut can only contain letters, numbers and underscore!");
+                else return CommandExecutionResponse.CouldNotExecute("Path shortcut can only contain letters, numbers or underscore.");
             }
-            //else
-            //{
-            //    throw new notimplementedexception("directory selection here.");
-            //}
 
-            return CommandExecutionRespond.CouldNotExecute;
+            return CommandExecutionResponse.CouldNotExecute("Invalid source path.");
+        }
+
+        /// <summary>
+        /// Removes a path from <see cref="Paths"/>.
+        /// </summary>
+        private CommandExecutionResponse RemoveSource(string[] args)
+        {
+            if(args.Length != 1) return CommandExecutionResponse.WrongNumberOfArguments(1, args.Length);
+
+            string alias = args.First();
+
+            if (Paths.ContainsKey(alias))
+            {
+                Paths.Remove(alias);
+                ExecutersHelper.SaveConfig(Paths, ConfigName);
+                return CommandExecutionResponse.Executed();
+            }
+            else
+                return CommandExecutionResponse.CouldNotExecute("Path shortcut not found.");
+        }
+
+        /// <summary>
+        /// Hides command window.
+        /// </summary>
+        private CommandExecutionResponse Hide(string[] args) =>
+            CommandExecutionResponse.Hide();
+
+        /// <summary>
+        /// Searches for <paramref name="args"/> on Google.
+        /// </summary>
+        private CommandExecutionResponse Search(string[] args)
+        {
+            if (args.Length < 1) return CommandExecutionResponse.WrongNumberOfArguments(1, args.Length);
+
+            string encoded = Uri.EscapeDataString(string.Join("+", args));
+            return OpenSource(("https://google.com/search?q=" + encoded).Split(' '));
         }
 
         /// <summary>
         /// Saves <see cref="Paths"/> and then exits the application.
         /// </summary>
-        /// <param name="args"></param>
-        /// <returns></returns>
-        private CommandExecutionRespond Exit(string[] args)
+        private CommandExecutionResponse Exit(string[] args)
         {
-            string deserialized = JsonSerializer.Serialize(Paths);
-            File.WriteAllText(Directory.GetCurrentDirectory() + "\\Configs\\quacc_config.json", deserialized);
+            ExecutersHelper.SaveConfig(Paths, ConfigName);
 
-            return CommandExecutionRespond.Exit;
-        }
-
-        private CommandExecutionRespond Search(string[] args)
-        {
-            if (args.Length < 1) return CommandExecutionRespond.WrongNumberOfArguments;
-
-            string encoded = Uri.EscapeDataString(string.Join("+", args));
-            return Open(("https://google.com/search?q=" + encoded).Split(' '));
+            return CommandExecutionResponse.Exit();
         }
 
         #endregion

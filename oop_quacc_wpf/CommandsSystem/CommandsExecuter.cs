@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using oop_quacc_wpf.CommandsSystem.ResponseSystem;
 
 namespace oop_quacc_wpf.CommandsSystem
 {
@@ -17,14 +18,19 @@ namespace oop_quacc_wpf.CommandsSystem
         public abstract string Name { get; protected set; }
 
         /// <summary>
+        /// Name of a config file.
+        /// </summary>
+        public abstract string ConfigName { get; protected set; }
+
+        /// <summary>
         /// Defines all the commands and their callbacks.
         /// </summary>
-        public Dictionary<string, Func<string[], CommandExecutionRespond>> Commands { get; protected set; }
+        public Dictionary<string, Func<string[], CommandExecutionResponse>> Commands { get; protected set; }
 
         /// <summary>
         /// Executes command <paramref name="comm"/> from <see cref="Commands"/> with arguments <paramref name="args"/>.
         /// </summary>
-        public CommandExecutionRespond Execute(string comm, params string[] args) =>
+        public CommandExecutionResponse Execute(string comm, params string[] args) =>
             Commands[comm](args);
 
         /// <summary>

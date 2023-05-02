@@ -1,5 +1,6 @@
 ﻿using oop_quacc_wpf.CommandsSystem;
 using oop_quacc_wpf.CommandsSystem.CommandsExecuters;
+using oop_quacc_wpf.CommandsSystem.ResponseSystem;
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
@@ -40,6 +41,13 @@ namespace oop_quacc_wpf
 
         IntPtr WindowHandle { get; set; }
         HwndSource Source { get; set; }
+        #endregion
+
+        #region Resources
+
+        const string GREEN_INDICATOR_PATH = "/Images/comm_response_green.png";
+        const string RED_INDICATOR_PATH = "/Images/comm_response_red.png";
+
         #endregion
 
         /// <summary>
@@ -126,16 +134,29 @@ namespace oop_quacc_wpf
                 {
                     if (textBox.Text != String.Empty)
                     {
-                        var respond = CommandsSystemManager.ExecuteCommand(textBox.Text.Trim(), ExecuterComboBox.SelectedItem as string);
+                        var response = CommandsSystemManager.ExecuteCommand(textBox.Text.Trim(), ExecuterComboBox.SelectedItem as string);
 
-                        if (respond == CommandExecutionRespond.Exit) Application.Current.Shutdown();
-                        if (respond == CommandExecutionRespond.Executed)
-                            textBox.Clear();
-                        else
-                            ShowErrorMessageBox(respond.ToString());
+                        UpdateGraphics(response);
+
+                        if (response.Context.ShouldExit) Application.Current.Shutdown();
+                        if (response.Context.ShouldHide) HideWindow();
                     }
                 }
             }
+        }
+
+        private void UpdateGraphics(CommandExecutionResponse r)
+        {
+            if(r.Status == ResponseStatus.Executed)
+            {
+                ResponseIndicator.Source = new BitmapImage(new Uri(GREEN_INDICATOR_PATH, UriKind.Relative));
+                CommandTextBox.Clear();
+            } else
+            {
+                ResponseIndicator.Source = new BitmapImage(new Uri(RED_INDICATOR_PATH, UriKind.Relative));
+            }
+
+            ResponseIndicator.ToolTip = r.Context.ResponseMessage;
         }
 
         /// <summary>

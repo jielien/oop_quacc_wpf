@@ -11,9 +11,11 @@
     </Window.Background>
     <DockPanel VerticalAlignment="Center">
 
-        <ComboBox x:Name="ExecuterComboBox" Width="120" Margin="20,0,0,0" FontSize="14" VerticalAlignment="Center"/>
+        <ComboBox DockPanel.Dock="Left" x:Name="ExecuterComboBox" Width="120" Margin="20,0,0,0" FontSize="14" VerticalAlignment="Center"/>
 
+        <Image x:Name="ResponseIndicator" DockPanel.Dock="Right" Source="/Images/comm_response_red.png" HorizontalAlignment="Right" VerticalAlignment="Center" Width="30" Margin="0,0,10,0" />
+        
+        <TextBox x:Name="CommandTextBox" TextWrapping="NoWrap" BorderThickness="0,0,0,2" FontFamily="Cascadia Code" FontSize="48" Margin="10,0,10,0" PreviewKeyDown="CommandTextBox_PreviewKeyDown" KeyDown="CommandTextBox_KeyDown" MaxHeight="80"/>
 
-        <TextBox x:Name="CommandTextBox" TextWrapping="Wrap" BorderThickness="0,0,0,2" FontFamily="Cascadia Code" FontSize="48" Margin="10,0,20,0" PreviewKeyDown="CommandTextBox_PreviewKeyDown" KeyDown="CommandTextBox_KeyDown" ScrollViewer.CanContentScroll="True" MaxHeight="80"/>
     </DockPanel>
 </Window>
