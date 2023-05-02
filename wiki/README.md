@@ -1,10 +1,28 @@
 ![Wiki banner](imgs/wiki_banner.png)
 
-First, let's learn how to even control QUACC. Currently there is not much functions that would correspond to some hotkeys. The only one in fact is hiding and showing the command window. When the window is shown, use *ESC* to hide it and then *Shift+Ctrl+P* to show it again.
+QUACC is command executing tool that can really help you focus just on those important things. It provides you with many features that can help you save some time that would be otherwise completely wasted.
 
-QUACC is command executing tool that can really help you focus on those really productive things. But to learn how to use it, you should know how QUACC works first. Below you can see a simple diagram of command input handling.
+# Visuals
 
-![Command input handling](imgs/quacc_cmd_accept_diagram.drawio.svg)
+Currently there is only one window - Command Window. Overview of it's important parts is below.
+
+![UI overiview](imgs/gui.png)
+
+## Commands Input Field
+
+Here you can write your commands. After pressing *Enter*, QUACC will try to execute it.
+
+## Commands Response Indicator
+
+This indicator has two variants: green and red. Green indicates successful command execution and red means there has been some sort of error. This indicator's tooltip provides further information about the response.
+
+## Executors Selection
+
+This is where you can change current Commands Executer.
+
+# Controls
+
+Now, let's learn how to control QUACC. Currently there is not much hotkey funtions. The only one in fact is hiding and showing the command window. When the window is shown, use *ESC* to hide it and then *Shift+Ctrl+P* to show it again.
 
 # Executers
 
@@ -20,17 +38,23 @@ This executer is responsible for basic sources navigation and resource managemen
 
 This command pops up a message box with a "Hello World" message. The `#args` input is also displayed.
 
-### Open
-
-> op **#arg**
-
-This command checks whether you have registered a shortcut to a *source* with the name `#arg`. If it is not recognised as a shortcut, QUACC tries to navigate to and open the *source* directly.
-
 ### Add Shortcut
 
-> adds **#name** **#path**
+> as **#name** **#path**
 
 This command creates a new shortcut under the name `#name` pointing to a *source* defined by `#path`.
+
+### Remove Shortcut
+
+> rs **#name**
+
+This command removes shortcut under the name `#name`.
+
+### Open Shortcut
+
+> os **#name**
+
+This command checks whether you have registered a shortcut to a *source* with the name `#name`. If it is not recognised as a shortcut, QUACC tries to navigate to and open the *source* directly.
 
 ### Search
 
@@ -38,8 +62,14 @@ This command creates a new shortcut under the name `#name` pointing to a *source
 
 Initiaties a Google search of given `#args`. In the future the search engine will be changeable.
 
+### Hide
+
+> h
+
+This command hides the application - same as pressing *ESC*.
+
 ### Exit
 
-> exit
+> x
 
 This command saves your shortcuts and exits the application.
