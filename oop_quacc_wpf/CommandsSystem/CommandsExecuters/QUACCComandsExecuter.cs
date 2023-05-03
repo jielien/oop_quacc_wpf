@@ -72,15 +72,15 @@ namespace oop_quacc_wpf.CommandsSystem.CommandsExecuters
         /// </summary>
         private CommandExecutionResponse OpenShortcut(string[] args)
         {
-            if (args.Length != 1) return CommandExecutionResponse.WrongNumberOfArguments(1, args.Length);
-
             var path = string.Join(' ', args);
             var url = ExecutersHelper.CreateValidURLFrom(path);
             if (Paths.ContainsKey(path))
                 ExecutersHelper.OpenWithDefaultApp(Paths[path]);
+            else if (Directory.Exists(path) || File.Exists(path))
+                ExecutersHelper.OpenWithDefaultApp(path); // open file or directory
             else if (url != null)
-                ExecutersHelper.OpenWithDefaultApp(url);
-            else return CommandExecutionResponse.CouldNotExecute("Source not found!");
+                ExecutersHelper.OpenWithDefaultApp(url); // open browser on url
+            else return CommandExecutionResponse.CouldNotExecute("Source not found.");
             return CommandExecutionResponse.Executed();
         }
 
