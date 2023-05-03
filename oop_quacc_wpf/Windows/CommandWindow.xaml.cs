@@ -1,5 +1,6 @@
 ﻿using oop_quacc_wpf.CommandsSystem;
 using oop_quacc_wpf.CommandsSystem.CommandsExecuters;
+using oop_quacc_wpf.CommandsSystem.ResponseSystem;
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
@@ -36,24 +37,41 @@ namespace oop_quacc_wpf
         private const uint MOD_CTRL = 0x02;
         private const uint MOD_SHIFT = 0x04;
 
-        private const uint VK_Q = 0x51;
+        private const uint VK_P = 0x50;
 
         IntPtr WindowHandle { get; set; }
         HwndSource Source { get; set; }
         #endregion
 
+        #region Resources
+
+        const string GREEN_INDICATOR_PATH = "/Images/comm_response_green.png";
+        const string RED_INDICATOR_PATH = "/Images/comm_response_red.png";
+
+        #endregion
+
+        /// <summary>
+        /// QUACC app default executers.
+        /// </summary>
         private CommandsExecuter[] DefaultExecuters =
-        { 
-            new QUACCComandsExecuter()
+        {
+            new QUACCComandsExecuter(),
+            new QUACCMathCommandsExecuter()
         };
 
         public CommandsSystemManager CommandsSystemManager { get; private set; }
 
         public CommandWindow()
         {
+            // Init CSM with default executers
             CommandsSystemManager = new CommandsSystemManager(new List<CommandsExecuter>(DefaultExecuters));
 
             InitializeComponent();
+
+            // add options to ExecuterComboBox
+            foreach (var e in CommandsSystemManager.Executers)
+                ExecuterComboBox.Items.Add(e.Name);
+            ExecuterComboBox.SelectedIndex = 0;
         }
 
         protected override void OnSourceInitialized(EventArgs e)
@@ -64,27 +82,16 @@ namespace oop_quacc_wpf
             CommandTextBox.Focus();
         }
 
-        // Cleans up
-        protected override void OnClosed(EventArgs e)
-        {
-            Source.RemoveHook(On_WindowShow);
-            UnregisterHotKey(WindowHandle, HK_ID_SHOW_WINDOW);
-            base.OnClosed(e);
-        }
-
-        // Create bindings to hotkeys and overall keyboard input
+        /// <summary>
+        /// Create bindings to hotkeys and overall keyboard input
+        /// </summary>
         private void InitializeHotkeys()
         {
-            // Register event for handling command inputs
-            EventManager.RegisterClassHandler(typeof(TextBox),
-                KeyUpEvent,
-                new KeyEventHandler(CommandTextBox_KeyUp));
-
             // Show command window hotkey
             WindowHandle = new WindowInteropHelper(this).Handle;
             Source = HwndSource.FromHwnd(WindowHandle);
             Source.AddHook(On_WindowShow);
-            RegisterHotKey(WindowHandle, HK_ID_SHOW_WINDOW, MOD_CTRL | MOD_SHIFT, VK_Q);
+            RegisterHotKey(WindowHandle, HK_ID_SHOW_WINDOW, MOD_CTRL | MOD_SHIFT, VK_P);
 
             // Hide command window hotkey
             RoutedCommand hideCmdWindow = new RoutedCommand();
@@ -92,32 +99,102 @@ namespace oop_quacc_wpf
             CommandBindings.Add(new CommandBinding(hideCmdWindow, On_WindowHide));
         }
 
-        // Shows command window
+        /// <summary>
+        /// Handles key input events, that cannot be handled by ordinary KeyDown event.
+        /// </summary>
+        private void CommandTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (sender is TextBox textBox)
+            {
+                // Commands history navigation
+                if (e.Key.Equals(Key.Up))
+                {
+                    var prev = CommandsSystemManager.PreviousCommand();
+                    if (prev != null)
+                        textBox.Text = prev;
+                }
+                else if (e.Key.Equals(Key.Down))
+                {
+                    var next = CommandsSystemManager.NextCommand();
+                    if (next != null)
+                        textBox.Text = next;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Is triggered when KeyDown event fires on <see cref="CommandTextBox"/>.
+        /// </summary>
+        private void CommandTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (sender is TextBox textBox)
+            {
+                // On command accept (there is a command in TextBox and Enter was pressed)
+                if (e.Key.Equals(Key.Enter))
+                {
+                    if (textBox.Text != String.Empty)
+                    {
+                        var response = CommandsSystemManager.ExecuteCommand(textBox.Text.Trim(), ExecuterComboBox.SelectedItem as string);
+
+                        UpdateGraphics(response);
+
+                        if (response.Context.ShouldExit) Application.Current.Shutdown();
+                        if (response.Context.ShouldHide) HideWindow();
+                    }
+                }
+            }
+        }
+
+        private void UpdateGraphics(CommandExecutionResponse r)
+        {
+            if(r.Status == ResponseStatus.Executed)
+            {
+                ResponseIndicator.Source = new BitmapImage(new Uri(GREEN_INDICATOR_PATH, UriKind.Relative));
+                CommandTextBox.Clear();
+            } else
+            {
+                ResponseIndicator.Source = new BitmapImage(new Uri(RED_INDICATOR_PATH, UriKind.Relative));
+            }
+
+            ResponseIndicator.ToolTip = r.Context.ResponseMessage;
+        }
+
+        /// <summary>
+        /// Shows command window and sets focus to it.
+        /// </summary>
         public void ShowWindow()
         {
             Visibility = Visibility.Visible;
             CommandTextBox.Focus();
         }
 
-        // Hides command window
+        /// <summary>
+        /// Hides command window.
+        /// </summary>
         public void HideWindow()
         {
             Visibility = Visibility.Collapsed;
         }
 
-        private void CommandTextBox_KeyUp(object sender, KeyEventArgs e)
+        /// <summary>
+        /// Unregisters hotkeys and closes the app.
+        /// </summary>
+        protected override void OnClosed(EventArgs e)
         {
-            // on command accept (there is a command in TextBox and Enter was pressed)
-            if (e.Key == Key.Enter && sender is TextBox textBox)
-            {
-                if(textBox.Text != String.Empty)
-                {
-                    // your event handler here
-                    e.Handled = true;
-                    MessageBox.Show(textBox.Text);
-                }
-            }
+            Source.RemoveHook(On_WindowShow);
+            UnregisterHotKey(WindowHandle, HK_ID_SHOW_WINDOW);
+            base.OnClosed(e);
         }
+
+        #region Utilities
+        /// <summary>
+        /// Shows a <see cref="MessageBox"/> with Error styling.
+        /// </summary>
+        private void ShowErrorMessageBox(string content)
+        {
+            MessageBox.Show(content, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+        #endregion
 
         #region Events
         // Recieves event from win os

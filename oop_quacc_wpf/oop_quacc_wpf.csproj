@@ -10,17 +10,37 @@
   <ItemGroup>
     <None Remove="Images\cmd_icon.png" />
     <None Remove="Images\comm_bg.png" />
+    <None Remove="Images\comm_response_green.png" />
+    <None Remove="Images\comm_response_red.png" />
     <None Remove="Images\quacc_icon.png" />
     <None Remove="Images\quacc_math_icon.png" />
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Images\cmd_icon.png" />
-    <Resource Include="Images\comm_bg.png">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    <Resource Include="Images\cmd_icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Images\quacc_icon.png" />
-    <Resource Include="Images\quacc_math_icon.png" />
+    <Resource Include="Images\comm_bg.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\comm_response_green.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\comm_response_red.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\quacc_icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\quacc_math_icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Configs\quacc_config.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

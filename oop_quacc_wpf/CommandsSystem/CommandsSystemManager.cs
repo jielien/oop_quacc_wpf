@@ -1,72 +1,93 @@
 ﻿using oop_quacc_wpf.CommandsSystem.CommandsExecuters;
+using oop_quacc_wpf.CommandsSystem.ResponseSystem;
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
+using System.Printing;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace oop_quacc_wpf.CommandsSystem
 {
-	public class CommandsSystemManager
-	{
-		public CommandsSystemManager(List<CommandsExecuter> executers)
-		{
-			Executers = executers;
+    /// <summary>
+    /// Handles all the <see cref="CommandsExecuter"/>s and input commands.
+    /// </summary>
+    public class CommandsSystemManager
+    {
+        private const uint HISTORY_SIZE = 16;
 
-			foreach (var e in Executers)
-			{
-				if (e is QUACCComandsExecuter)
-					SelectedExecuter = e;
-			}
-		}
+        public CommandsSystemManager(List<CommandsExecuter> executers)
+        {
+            Executers = executers;
+            CommandsHistory = new CommandsHistory(HISTORY_SIZE);
+        }
 
-		public List<CommandsExecuter> Executers { get; private set; }
-		public CommandsExecuter SelectedExecuter { get; private set; }
+        /// <summary>
+        /// All usable <see cref="CommandsExecuter"/>s.
+        /// </summary>
+        public List<CommandsExecuter> Executers { get; private set; }
 
-		/// <summary>
-		/// Tries to find and execute command. If no <see cref="CommandsExecuter"/> is given, executes on <see cref="SelectedExecuter"/>. If command was not found in <see cref="SelectedExecuter"/>, tries to find it and execute in other <see cref="Executers"/>.
-		/// </summary>
-		public CommandExecutionState ExecuteCommand(string c, CommandsExecuter? e = null)
-		{
-			var state = CommandExecutionState.CouldNotExecute; // init command execution state
+        /// <summary>
+        /// Provides a history of recent commands.
+        /// </summary>
+        private CommandsHistory CommandsHistory { get; set; }
 
-			if (e == null)
-			{
-				state = SelectedExecuter.TryExecute(c); // try to execute with SelectedExecutor primarily
-				if (state == CommandExecutionState.CommandNotFound)
-					foreach (var executer in Executers) // if command was not found, try to execute with each Executer
-					{
-						if (executer.GetType() != SelectedExecuter.GetType()) // don't execute with SelectedExecuter again
-							state = ExecuteCommand(c, executer);
-						if (state == CommandExecutionState.Executed) break; // if command successfully executed, break foreach
-					}
-			}
-			else
-				state = e.TryExecute(c);
+        /// <summary>
+        /// Tries to find and execute command. If command was not found in <paramref name="executer"/>, tries to find it and execute in other <see cref="Executers"/>.
+        /// </summary>
+        public CommandExecutionResponse ExecuteCommand(string command, string executerName)
+        {
+            CommandsHistory.Add(command);
 
-			return state;
-		}
+            // Extract command and arguments
+            var splitted = command.Split(' ');
+            var comm = splitted[0];
+            var args = splitted.Skip(1).ToArray();
 
-		/// <summary>
-		/// Tries to add <see cref="CommandsExecuter"/> <paramref name="e"/>, unless there already is a <see cref="CommandsExecuter"/> of the same type.
-		/// </summary>
-		/// <returns>True if <paramref name="e"/> was successfully canAdd, False instead.</returns>
-		public bool AddExecuter(CommandsExecuter e)
-		{
-			bool canAdd = true;
-			foreach (var executer in Executers)
-			{
-				// check if there already is Executer of the same type
-				if (executer.GetType() == e.GetType())
-				{
-					canAdd = false;
-					break;
-				}
-			}
-			if (canAdd) Executers.Add(e);
+            // Find valid executer and try to execute
+            var validExecuters = Executers.Where(e => e.Name == executerName);
+            if (validExecuters.Count() == 1) // if executer was found
+            {
+                var executer = validExecuters.ElementAt(0);
+                if (executer.CommandIsValid(command)) // if command is valid
+                    return executer.Execute(comm, args);
+                else
+                {
+                    foreach (var e in Executers)
+                        if (!e.GetType().Equals(executer)) // if executer is not same as e
+                            if (e.CommandIsValid(command)) // if command is valid
+                                return e.Execute(comm, args);
+                    return CommandExecutionResponse.CommandNotFound();
+                }
+            }
+            else return CommandExecutionResponse.InvalidExecuter();
+        }
 
-			return canAdd;
-		}
-	}
+        /// <summary>
+        /// Tries to add <see cref="CommandsExecuter"/> <paramref name="e"/>, unless there already is a <see cref="CommandsExecuter"/> of the same type.
+        /// </summary>
+        /// <returns>True if <paramref name="e"/> was successfully canAdd, False instead.</returns>
+        public bool AddExecuter(CommandsExecuter e)
+        {
+            bool canAdd = true;
+            foreach (var executer in Executers)
+            {
+                // check if there already is Executer of the same type
+                if (executer.GetType() == e.GetType())
+                {
+                    canAdd = false;
+                    break;
+                }
+            }
+            if (canAdd) Executers.Add(e);
+
+            return canAdd;
+        }
+
+        public string? NextCommand() =>
+            CommandsHistory.Next();
+        public string? PreviousCommand() =>
+            CommandsHistory.Previous();
+    }
 }
