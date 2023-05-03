@@ -2,6 +2,10 @@
 
 QUACC is command executing tool that can really help you focus just on those important things. It provides you with many features that can help you save some time that would be otherwise completely wasted.
 
+# Architecture overview
+
+![Architecture](imgs/Screenshot_2023-05-03-12-47-23-92_4a24d271e133915ae237d4bec6ffe368.jpg)
+
 # Visuals
 
 Currently there is only one window - Command Window. Overview of it's important parts is below.
