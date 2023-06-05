@@ -1,6 +1,6 @@
 ![QUACC banner](/banner.png)
 
-QUACC is a Windows Presentation Foundation (WPF) application that provides the user with a quick command line interface. Using the command line, users can open files, directories, URLs, create notes, reminders, and more.
+QUACC, aka QUick ACCes command line, is a Windows Presentation Foundation (WPF) application that provides the user with a quick command line interface. Using the command line, users can open files, directories, URLs, create notes, reminders, and more.
 
 More detailed information on [WIKI](/wiki/).
 
