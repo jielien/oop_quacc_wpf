@@ -17,11 +17,13 @@ The latest version, __Armstrong__, is the first version that is somewhat usable.
 
 ## Features
 
-- Creating shortcuts to files and directories
-- Opening URLs
+- Creating shortcuts to files, directories or URLs
+- Directly opening files, directories and URLs
+- Quick Google search
+- Basic commands history
 - ...
 - That's about it.
 
 # What's to Come?
 
-Right now is the app in version 0.0.1 Armstrong and is actually quite useful alredy. So the first item on my to-do list is to make QUACC more user-friendly by working on the user interface, creating a settings window, and potentially implementing color templates.
+Right now is the app in version 0.0.1 Armstrong and is actually quite useful already. So the first item on my to-do list is to make QUACC more user-friendly by working on the user interface, creating a settings window, and potentially implementing color templates.
